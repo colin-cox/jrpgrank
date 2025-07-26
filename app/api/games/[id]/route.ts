@@ -4,9 +4,10 @@ import { ApiResponse, Game } from '@/types';
 
 export async function GET(
   request: Request,
-  { params }: { params: { id: string } }
+  context: { params: Promise<{ id: string }> }
 ): Promise<NextResponse<ApiResponse<Game>>> {
   try {
+    const params = await context.params;
     const game = getGameById(params.id);
     
     if (!game) {

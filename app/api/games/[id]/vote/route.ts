@@ -6,14 +6,15 @@ import { cookies } from 'next/headers';
 
 export async function POST(
   request: Request,
-  { params }: { params: { id: string } }
+  context: { params: Promise<{ id: string }> }
 ): Promise<NextResponse<ApiResponse<{ votes: number; hasVoted: boolean }>>> {
   try {
     const { voteType }: VoteRequest = await request.json();
+    const params = await context.params;
     const gameId = params.id;
     
     // Get or create session ID
-    const cookieStore = cookies();
+    const cookieStore = await cookies();
     let sessionId = cookieStore.get('sessionId')?.value;
     
     if (!sessionId) {
@@ -58,7 +59,7 @@ export async function POST(
     });
     
     // Set session cookie if it doesn't exist
-    if (!cookieStore.get('sessionId')?.value) {
+    if (!(await cookies()).get('sessionId')?.value) {
       response.cookies.set('sessionId', sessionId, {
         httpOnly: true,
         secure: process.env.NODE_ENV === 'production',
