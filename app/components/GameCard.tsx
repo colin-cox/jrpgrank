@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import Image from 'next/image';
 import { Game } from '@/types';
 
 interface GameCardProps {
@@ -12,6 +13,7 @@ interface GameCardProps {
 export default function GameCard({ game, onVote, hasVoted }: GameCardProps) {
   const [isVoting, setIsVoting] = useState(false);
   const [localVotes, setLocalVotes] = useState(game.votes);
+  const [imageError, setImageError] = useState(false);
 
   const handleVote = async (voteType: 'up' | 'down') => {
     if (hasVoted || isVoting) return;
@@ -37,13 +39,28 @@ export default function GameCard({ game, onVote, hasVoted }: GameCardProps) {
   return (
     <div className="bg-white rounded-lg shadow-lg overflow-hidden transition-transform hover:scale-[1.02] duration-200">
       <div className="relative">
-        <div className="w-full h-48 bg-gradient-to-br from-purple-100 to-blue-100 flex items-center justify-center">
-          <div className="text-gray-500 text-center">
-            <div className="text-4xl mb-2">🎮</div>
-            <div className="text-sm">Game Cover</div>
-          </div>
+        <div className="w-full h-48 bg-gradient-to-br from-purple-100 to-blue-100 relative overflow-hidden">
+          {!imageError ? (
+            <Image
+              src={game.coverImageUrl}
+              alt={`${game.title} cover art`}
+              fill
+              className="object-cover"
+              onError={() => setImageError(true)}
+              sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+              priority={game.rank <= 3}
+            />
+          ) : (
+            <div className="w-full h-full flex items-center justify-center text-gray-500">
+              <div className="text-center">
+                <div className="text-4xl mb-2">🎮</div>
+                <div className="text-sm font-medium">{game.title}</div>
+                <div className="text-xs">({game.releaseYear})</div>
+              </div>
+            </div>
+          )}
         </div>
-        <div className={`absolute top-4 left-4 px-3 py-1 rounded-full text-sm font-bold ${getRankBadgeColor(game.rank)}`}>
+        <div className={`absolute top-4 left-4 px-3 py-1 rounded-full text-sm font-bold ${getRankBadgeColor(game.rank)} shadow-lg`}>
           #{game.rank}
         </div>
       </div>
