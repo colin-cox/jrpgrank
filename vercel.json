@@ -1,11 +1,5 @@
 {
   "version": 2,
-  "projectSettings": {
-    "passwordProtection": false,
-    "deploymentProtection": {
-      "deploymentType": "all"
-    }
-  },
   "github": {
     "silent": true
   }
